@@ -87,6 +87,31 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    
+    #initialization
+    listNode=util.Queue()
+    evaluatedState=problem.getStartState()
+    visitedNode=[evaluatedState]
+
+    while(not problem.isGoalState(evaluatedState)):
+        #Do the research while we haven't found the goal
+
+        #Develop the node :
+        listSuccesors=problem.getSuccessors(evaluatedState)
+        for succesor in listSuccesors:
+            if( not succesor[0] in visitedNode):
+                # Prevent from infinite loops
+                listNode.push(succesor[0])
+        evaluatedState=listNode.pop()
+        visitedNode.append(evaluatedState)
+        print(evaluatedState)
+
+    if(problem.isGoalState(evaluatedState)):
+        print("Goal founded :",evaluatedState )
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
