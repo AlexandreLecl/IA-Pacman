@@ -87,32 +87,45 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    #Initialization
+    openList=util.Queue()
+    start=problem.getStartState()
+    evaluatedState=(start,'Stop',0)
+    closedList=[(evaluatedState,None)]  #Open and closed list contains tuples of form (Node,Ancestor)
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    
-    #initialization
-    listNode=util.Queue()
-    evaluatedState=problem.getStartState()
-    visitedNode=[evaluatedState]
-
-    while(not problem.isGoalState(evaluatedState)):
+    while(not problem.isGoalState(evaluatedState[0])):
         #Do the research while we haven't found the goal
-
+        
         #Develop the node :
-        listSuccesors=problem.getSuccessors(evaluatedState)
+        listSuccesors=problem.getSuccessors(evaluatedState[0])
         for succesor in listSuccesors:
-            if( not succesor[0] in visitedNode):
-                # Prevent from infinite loops
-                listNode.push(succesor[0])
-        evaluatedState=listNode.pop()
-        visitedNode.append(evaluatedState)
-        print(evaluatedState)
+            # Check if the node isn't in the closed list to prevent infinite loops
+            alreadyVisited=False
+            for element in closedList :
+                if(succesor[0]==element[0][0]):
+                    alreadyVisited=True
+            if(not alreadyVisited):
+                openList.push((succesor,evaluatedState))
+                
+        if openList.isEmpty():
+            print("No goal found")
+            return []
+        else :
+            # Visit the next node in the open list
+            temporaryTuple=openList.pop()
+            closedList.append(temporaryTuple)
+            evaluatedState=temporaryTuple[0]
 
-    if(problem.isGoalState(evaluatedState)):
-        print("Goal founded :",evaluatedState )
-    util.raiseNotDefined()
+    # Create list of actions
+    listAction=[]
+    while(evaluatedState[0]!=start):
+        for element in closedList:
+            if(element[0][0]==evaluatedState[0]):
+                ancestor=element[1]
+                listAction.insert(0,evaluatedState[1])
+                evaluatedState=ancestor
+            
+    return listAction
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
