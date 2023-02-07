@@ -88,7 +88,7 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     #Initialization
-    openList=util.Queue()
+    openList=util.Stack()
     start=problem.getStartState()
     evaluatedState=(start,'Stop',0)
     closedList=[(evaluatedState,None)]  #Open and closed list contains tuples of form (Node,Ancestor)
@@ -124,7 +124,6 @@ def depthFirstSearch(problem):
                 ancestor=element[1]
                 listAction.insert(0,evaluatedState[1])
                 evaluatedState=ancestor
-            
     return listAction
 
 def breadthFirstSearch(problem):
