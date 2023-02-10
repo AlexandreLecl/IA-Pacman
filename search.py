@@ -170,8 +170,71 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    #Initialization
+    openList=util.PriorityQueue()
+    start=problem.getStartState()
+    evaluatedState=(start,'Stop',0)
+    closedList=[(evaluatedState,None,0)]  #Open and closed list contains tuples of form (Node,Ancestor,Cost)
+    toDevelop=True
+    while(not problem.isGoalState(evaluatedState[0])):
+        #Do the research while we haven't found the goal
+        
+        
+        if(toDevelop):
+            #Develop the node :
+            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            for succesor in listSuccesors:
+                # Find the cost to this Node
+                actions=[]  #List of actions from the start to this node
+                thisNode= succesor
+                while(thisNode[0]!=start):
+                    for element in closedList:
+                        if(element[0][0]==thisNode[0]):
+                            ancestor=element[1]
+                            actions.insert(0,thisNode[1])
+                            thisNode=ancestor
+                cost=start.getCostOfActions(actions)
+                print("cost calculated\n")
+
+                openList.push((succesor,evaluatedState,cost))
+                
+        if openList.isEmpty():
+            print("No goal found")
+            return []
+        else :
+            toDevelop=True
+            # Visit the next node in the open list
+            temporaryTuple=openList.pop()
+            bestway=True
+            for element in closedList:
+                if(temporaryTuple[0]==element[0]):
+                    #There is the same node visited
+                    if(temporaryTuple[2]>=element[2]):
+                        #with a lower cost
+                        bestway=False
+                    else:
+                        #with a higher cost
+                        element[2]=temporaryTuple[2] # cost
+                        element[1]=temporaryTuple[1] # ancestor
+
+
+            if(bestway):         
+                closedList.append(temporaryTuple)
+                evaluatedState=temporaryTuple[0] # risque inf loop
+            else:
+                toDevelop=False
+           
+
+    # Create list of actions
+    listAction=[]
+    while(evaluatedState[0]!=start):
+        for element in closedList:
+            if(element[0][0]==evaluatedState[0]):
+                ancestor=element[1]
+                listAction.insert(0,evaluatedState[1])
+                evaluatedState=ancestor
+    return listAction
 
 def nullHeuristic(state, problem=None):
     """
