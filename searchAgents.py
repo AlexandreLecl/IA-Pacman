@@ -287,22 +287,32 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
+        listGoal=[]
+        for corner in self.corners:
+            listGoal.append([corner,False]) # (position,isCornerCompleted)
+        self.listGoal=listGoal
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startingPosition
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        allCornersVisited=True
+        for goal in self.listGoal:
+            if state==goal[0]:
+                if not goal[1]:
+                    goal[1]=True
+
+            if not goal[1]:
+                allCornersVisited=False
+        
+        return allCornersVisited
 
     def getSuccessors(self, state):
         """
@@ -314,9 +324,10 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        
         successors = []
-        for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
+        x,y=state
+        for direction in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
             #   x,y = currentPosition
@@ -324,9 +335,20 @@ class CornersProblem(search.SearchProblem):
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
+            
+            dx, dy = Actions.directionToVector(direction)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                for goal in self.listGoal:
+                    #Check if the succesor is an unvisited corner
+                    if (nextx,nexty)==goal[0]:
+                        if not goal[1]:
+                            goal[1]=True
+                successors.append(((nextx,nexty),direction,1))
 
         self._expanded += 1 # DO NOT CHANGE
+
         return successors
 
     def getCostOfActions(self, actions):
@@ -359,7 +381,8 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
+    sumCornersDistance=0
+    
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):

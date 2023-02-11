@@ -88,30 +88,32 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     #Initialization
-    openList=util.Stack()
+    openList=util.Stack() # contains (position,listActions)
     start=problem.getStartState()
-    evaluatedState=(start,'Stop',0)
-    closedList=[(evaluatedState,None)]  #Open and closed list contains tuples of form (Node,Ancestor)
+    closedList=[start]  #Open and closed list contains visited emplacement
 
     #Develop the first node
     listSuccesors=problem.getSuccessors(start)
     for succesor in listSuccesors:
-        openList.push((succesor,evaluatedState))
+        openList.push((succesor[0],[succesor[1]])) 
 
-    while(not problem.isGoalState(evaluatedState[0])):
+    evaluatedState=start
+    while(not problem.isGoalState(evaluatedState)):
         #Do the research while we haven't found the goal
 
         # Check if the node isn't in the closed list to prevent infinite loops
         alreadyVisited=False
         for element in closedList :
-            if(evaluatedState[0]==element[0][0]):
+            if(evaluatedState==element):
                 alreadyVisited=True
         if(not alreadyVisited):
             #Develop the node :
-            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            listSuccesors=problem.getSuccessors(evaluatedState)
             for succesor in listSuccesors:
-                openList.push((succesor,evaluatedState))
-            closedList.append(temporaryTuple)
+                position=succesor[0]
+                action=succesor[1]
+                openList.push((position,listAction+[action]))
+            closedList.append(evaluatedState)
         
         if openList.isEmpty():
             print("No goal found")
@@ -120,47 +122,40 @@ def depthFirstSearch(problem):
             # Visit the next node in the open list
             temporaryTuple=openList.pop()
             evaluatedState=temporaryTuple[0]
-                
-    closedList.append(temporaryTuple) #add the (Goal,goalAncestor) to the closed list
+            listAction=temporaryTuple[1]
 
-    # Create list of actions
-    listAction=[]
-    while(evaluatedState[0]!=start):
-        for element in closedList:
-            if(element[0][0]==evaluatedState[0]):
-                ancestor=element[1]
-                listAction.insert(0,evaluatedState[1])
-                evaluatedState=ancestor
     return listAction
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     #To compare with depthFirstSearch, we replaced the Stack by a Queue for the open list 
     #Initialization
-    openList=util.Queue()
+    openList=util.Queue() # contains (position,listActions)
     start=problem.getStartState()
-    evaluatedState=(start,'Stop',0)
-    closedList=[(evaluatedState,None)]  #Open and closed list contains tuples of form (Node,Ancestor)
+    closedList=[start]  #Open and closed list contains visited emplacement
 
     #Develop the first node
     listSuccesors=problem.getSuccessors(start)
     for succesor in listSuccesors:
-        openList.push((succesor,evaluatedState))
+        openList.push((succesor[0],[succesor[1]])) 
 
-    while(not problem.isGoalState(evaluatedState[0])):
+    evaluatedState=start
+    while(not problem.isGoalState(evaluatedState)):
         #Do the research while we haven't found the goal
 
         # Check if the node isn't in the closed list to prevent infinite loops
         alreadyVisited=False
         for element in closedList :
-            if(evaluatedState[0]==element[0][0]):
+            if(evaluatedState==element):
                 alreadyVisited=True
         if(not alreadyVisited):
             #Develop the node :
-            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            listSuccesors=problem.getSuccessors(evaluatedState)
             for succesor in listSuccesors:
-                openList.push((succesor,evaluatedState))
-            closedList.append(temporaryTuple)
+                position=succesor[0]
+                action=succesor[1]
+                openList.push((position,listAction+[action]))
+            closedList.append(evaluatedState)
         
         if openList.isEmpty():
             print("No goal found")
@@ -169,17 +164,8 @@ def breadthFirstSearch(problem):
             # Visit the next node in the open list
             temporaryTuple=openList.pop()
             evaluatedState=temporaryTuple[0]
-                
-    closedList.append(temporaryTuple) #add the (Goal,goalAncestor) to the closed list
+            listAction=temporaryTuple[1]
 
-    # Create list of actions
-    listAction=[]
-    while(evaluatedState[0]!=start):
-        for element in closedList:
-            if(element[0][0]==evaluatedState[0]):
-                ancestor=element[1]
-                listAction.insert(0,evaluatedState[1])
-                evaluatedState=ancestor
     return listAction
 
 def uniformCostSearch(problem):
