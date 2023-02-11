@@ -269,7 +269,6 @@ def euclideanHeuristic(position, problem, info={}):
 class CornersProblem(search.SearchProblem):
     """
     This search problem finds paths through all four corners of a layout.
-
     You must select a suitable state space and successor function
     """
 
@@ -316,7 +315,6 @@ class CornersProblem(search.SearchProblem):
     def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
-
          As noted in search.py:
             For a given state, this should return a list of triples, (successor,
             action, stepCost), where 'successor' is a successor to the current
@@ -346,7 +344,7 @@ class CornersProblem(search.SearchProblem):
                     if not alreadyVisited:
                         successorVisitedCorners.append( nextPosition )
 
-                successors.append((nextPosition, successorVisitedCorners), action, 1)
+                successors.append(((nextPosition, successorVisitedCorners), action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors

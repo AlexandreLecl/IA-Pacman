@@ -132,7 +132,7 @@ def breadthFirstSearch(problem):
     #Initialization
     openList=util.Queue() # contains (position,listActions)
     start=problem.getStartState()
-    closedList=[start]  #Open and closed list contains visited emplacement
+    closedList=[start]  # contains visited emplacement
 
     #Develop the first node
     listSuccesors=problem.getSuccessors(start)
@@ -170,33 +170,35 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    
     #Initialization
-    openList=util.PriorityQueue()
+    openList=util.PriorityQueue() # contains (position,listActions,cumulatedCost)
     start=problem.getStartState()
-    evaluatedState=(start,'Stop',0)
-    closedList=[(evaluatedState,None,0)]  #Open and closed list contains tuples of form (Node,Ancestor,cumulatedCost)
+    closedList=[start]  # contains visited emplacement
 
     #Develop the first node
     listSuccesors=problem.getSuccessors(start)
     for succesor in listSuccesors:
         cumulatedCost=succesor[2]
-        openList.push((succesor,evaluatedState,cumulatedCost),cumulatedCost)
+        openList.push((succesor[0],[succesor[1]],cumulatedCost),cumulatedCost)
 
-    while(not problem.isGoalState(evaluatedState[0])):
+    evaluatedState=start
+    while(not problem.isGoalState(evaluatedState)):
         #Do the research while we haven't found the goal
 
         # Check if the node isn't in the closed list to prevent infinite loops
         alreadyVisited=False
         for element in closedList :
-            if(evaluatedState[0]==element[0][0]):
+            if(evaluatedState==element):
                 alreadyVisited=True
         if(not alreadyVisited):
             #Develop the node :
-            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            listSuccesors=problem.getSuccessors(evaluatedState)
             for succesor in listSuccesors:
-                openList.update((succesor,evaluatedState,succesor[2]+cumulatedCost),succesor[2]+cumulatedCost)
-            closedList.append(temporaryTuple)
+                position=succesor[0]
+                action=succesor[1]
+                cost=succesor[2]
+                openList.update((position,listAction + [action],cost+cumulatedCost),cost+cumulatedCost)
+            closedList.append(evaluatedState)
         
         if openList.isEmpty():
             print("No goal found")
@@ -205,18 +207,9 @@ def uniformCostSearch(problem):
             # Visit the next node in the open list
             temporaryTuple=openList.pop()
             evaluatedState=temporaryTuple[0]
+            listAction=temporaryTuple[1]
             cumulatedCost=temporaryTuple[2]
                 
-    closedList.append(temporaryTuple) #add the (Goal,goalAncestor) to the closed list
-
-    # Create list of actions
-    listAction=[]
-    while(evaluatedState[0]!=start):
-        for element in closedList:
-            if(element[0][0]==evaluatedState[0]):
-                ancestor=element[1]
-                listAction.insert(0,evaluatedState[1])
-                evaluatedState=ancestor
     return listAction
 
 def nullHeuristic(state, problem=None):
@@ -228,34 +221,38 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-   #Initialization
-    openList=util.PriorityQueue()
+
+    #Initialization
+    openList=util.PriorityQueue() # contains (position,listActions,cumulatedCost)
     start=problem.getStartState()
-    evaluatedState=(start,'Stop',0)
-    closedList=[(evaluatedState,None,0)]  #Open and closed list contains tuples of form (Node,Ancestor,cumulatedCost)
-    
+    closedList=[start]  # contains visited emplacement
+
     #Develop the first node
     listSuccesors=problem.getSuccessors(start)
     for succesor in listSuccesors:
         cumulatedCost=succesor[2]
         fn=cumulatedCost+heuristic(succesor[0],problem)
-        openList.push((succesor,evaluatedState,cumulatedCost),fn)
-    cumulatedCost=0
-    while(not problem.isGoalState(evaluatedState[0])):
+        openList.push((succesor[0],[succesor[1]],cumulatedCost),fn)
+
+    evaluatedState=start
+    while(not problem.isGoalState(evaluatedState)):
         #Do the research while we haven't found the goal
 
         # Check if the node isn't in the closed list to prevent infinite loops
         alreadyVisited=False
         for element in closedList :
-            if(evaluatedState[0]==element[0][0]):
+            if(evaluatedState==element):
                 alreadyVisited=True
         if(not alreadyVisited):
             #Develop the node :
-            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            listSuccesors=problem.getSuccessors(evaluatedState)
             for succesor in listSuccesors:
-                fn=succesor[2]+cumulatedCost+heuristic(succesor[0],problem)
-                openList.update((succesor,evaluatedState,succesor[2]+cumulatedCost),fn)
-            closedList.append(temporaryTuple)
+                position=succesor[0]
+                action=succesor[1]
+                cost=succesor[2]
+                fn=cost+cumulatedCost+heuristic(position,problem)
+                openList.update((position,listAction + [action],cost+cumulatedCost),fn)
+            closedList.append(evaluatedState)
         
         if openList.isEmpty():
             print("No goal found")
@@ -264,20 +261,10 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             # Visit the next node in the open list
             temporaryTuple=openList.pop()
             evaluatedState=temporaryTuple[0]
+            listAction=temporaryTuple[1]
             cumulatedCost=temporaryTuple[2]
                 
-    closedList.append(temporaryTuple) #add the (Goal,goalAncestor) to the closed list
-
-    # Create list of actions
-    listAction=[]
-    while(evaluatedState[0]!=start):
-        for element in closedList:
-            if(element[0][0]==evaluatedState[0]):
-                ancestor=element[1]
-                listAction.insert(0,evaluatedState[1])
-                evaluatedState=ancestor
     return listAction
-
 
 # Abbreviations
 bfs = breadthFirstSearch
