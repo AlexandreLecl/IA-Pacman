@@ -242,8 +242,55 @@ def nullHeuristic(state, problem=None):
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+   #Initialization
+    openList=util.PriorityQueue()
+    start=problem.getStartState()
+    evaluatedState=(start,'Stop',0)
+    closedList=[(evaluatedState,None,0)]  #Open and closed list contains tuples of form (Node,Ancestor,cumulatedCost)
+    
+    #Develop the first node
+    listSuccesors=problem.getSuccessors(start)
+    for succesor in listSuccesors:
+        cumulatedCost=succesor[2]
+        fn=cumulatedCost+heuristic(succesor[0],problem)
+        openList.push((succesor,evaluatedState,cumulatedCost),fn)
+    cumulatedCost=0
+    while(not problem.isGoalState(evaluatedState[0])):
+        #Do the research while we haven't found the goal
+
+        # Check if the node isn't in the closed list to prevent infinite loops
+        alreadyVisited=False
+        for element in closedList :
+            if(evaluatedState[0]==element[0][0]):
+                alreadyVisited=True
+        if(not alreadyVisited):
+            #Develop the node :
+            listSuccesors=problem.getSuccessors(evaluatedState[0])
+            for succesor in listSuccesors:
+                fn=succesor[2]+cumulatedCost+heuristic(succesor[0],problem)
+                openList.update((succesor,evaluatedState,succesor[2]+cumulatedCost),fn)
+            closedList.append(temporaryTuple)
+        
+        if openList.isEmpty():
+            print("No goal found")
+            return []
+        else :
+            # Visit the next node in the open list
+            temporaryTuple=openList.pop()
+            evaluatedState=temporaryTuple[0]
+            cumulatedCost=temporaryTuple[2]
+                
+    closedList.append(temporaryTuple) #add the (Goal,goalAncestor) to the closed list
+
+    # Create list of actions
+    listAction=[]
+    while(evaluatedState[0]!=start):
+        for element in closedList:
+            if(element[0][0]==evaluatedState[0]):
+                ancestor=element[1]
+                listAction.insert(0,evaluatedState[1])
+                evaluatedState=ancestor
+    return listAction
 
 
 # Abbreviations
