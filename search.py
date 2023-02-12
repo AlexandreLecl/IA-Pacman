@@ -262,8 +262,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             temporaryTuple=openList.pop()
             evaluatedState=temporaryTuple[0]
             listAction=temporaryTuple[1]
-            cumulatedCost=temporaryTuple[2]
-                
+            cumulatedCost=temporaryTuple[2]  
     return listAction
 
 # Abbreviations

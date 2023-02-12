@@ -378,10 +378,34 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-    sumCornersDistance=0
     
-    return 0 # Default to trivial solution
+    position = state[0]
+    visitedCorners= state[1]
+    listDist=[]
+    sumDistCorner=0
+    cornerToVisit=[]
+    
+
+    if problem.isGoalState(state):
+        return 0
+
+    for i in range(4):
+        if corners[i] not in visitedCorners:
+            cornerToVisit.append(corners[i])
+
+    currentPosition = position
+    while(cornerToVisit!=[]):
+        listDist=[]
+        for corner in cornerToVisit:
+            distance=util.manhattanDistance(currentPosition ,corner)
+            listDist.append((distance,corner))
+        
+        distancemin,minCorner=min(listDist)
+        sumDistCorner += distancemin
+        currentPosition = minCorner # Start from the closest corner
+        cornerToVisit.remove(minCorner) 
+
+    return sumDistCorner
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -473,9 +497,39 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    
+    if problem.isGoalState(state):
+        return 0
+    
+    listFood = foodGrid.asList()
+    if len(listFood) == 0:
+        return 0
+
+    distanceList = []
+    for food in listFood:
+        distance=util.manhattanDistance(position, food)
+        distanceList.append(distance)
+
+    maxDistance = max(distanceList)
+    
+    return maxDistance 
+
+    """
+    # functional but 0/4 on autograde
+    listFood = foodGrid.asList()
+    sum = 0
+    currentPoint = position
+    while listFood:
+        distance, food = min([(util.manhattanDistance(currentPoint, food), food) for food in listFood])
+        listFood.remove(food)
+        currentPoint = food
+        sum += distance
+
+    return sum
+    """
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -505,8 +559,24 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        toVisit = util.Queue()
+        toVisit.push(startPosition)
+        visitedEmplacemnt = []
+        while(not toVisit.isEmpty()):
+            position = toVisit.pop()
+            x,y=position
+            if(food[x][y]):
+                closestPoint=position
+                break
+            else:
+                succesors=problem.getSuccessors(position)
+                for succesor in succesors:
+                    if(succesor not in visitedEmplacemnt):
+                        toVisit.push(succesor[0])
+                        visitedEmplacemnt.append(succesor)
+
+        problem = PositionSearchProblem(gameState, goal=closestPoint, start=startPosition,  warn=False, visualize=False)
+        return search.astar(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
